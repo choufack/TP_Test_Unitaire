@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orders</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <script src="/static/js/scripts.js" defer></script>
+</head>
+<body>
+    <header>
+        <h1>Orders</h1>
+        <nav>
+            <a href="/">Home</a>
+            <a href="/menu">Menu</a>
+            <a href="/cart">Cart</a>
+        </nav>
+    </header>
+    <main>
+        <ul id="orders-list"></ul>
+    </main>
+    <script>
+        // Fetch orders from the backend
+        fetch('/orders')
+            .then(response => response.json())
+            .then(data => {
+                const ordersList = document.getElementById('orders-list');
+                data.forEach(order => {
+                    const li = document.createElement('li');
+                    li.textContent = `Order #${order.id} - Total: $${order.final_total} - Status: ${order.status}`;
+                    ordersList.appendChild(li);
+                });
+            });
+    </script>
+</body>
+</html>
