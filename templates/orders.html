@@ -1,36 +1,32 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Orders</title>
-    <link rel="stylesheet" href="/static/css/styles.css">
-    <script src="/static/js/scripts.js" defer></script>
-</head>
-<body>
-    <header>
-        <h1>Orders</h1>
-        <nav>
-            <a href="/">Home</a>
-            <a href="/menu">Menu</a>
-            <a href="/cart">Cart</a>
-        </nav>
-    </header>
-    <main>
-        <ul id="orders-list"></ul>
-    </main>
-    <script>
-        // Fetch orders from the backend
-        fetch('/orders')
-            .then(response => response.json())
-            .then(data => {
-                const ordersList = document.getElementById('orders-list');
-                data.forEach(order => {
-                    const li = document.createElement('li');
-                    li.textContent = `Order #${order.id} - Total: $${order.final_total} - Status: ${order.status}`;
-                    ordersList.appendChild(li);
-                });
-            });
-    </script>
-</body>
-</html>
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">Commandes en cours</h2>
+    <div id="orders-list" class="row"></div>
+</div>
+
+<script>
+fetch('/orders')
+  .then(res => res.json())
+  .then(data => {
+    const container = document.getElementById("orders-list");
+    if (data.length === 0) {
+      container.innerHTML = "<p>Aucune commande trouvée.</p>";
+      return;
+    }
+    data.forEach(order => {
+      const div = document.createElement("div");
+      div.className = "col-md-6 mb-3";
+      div.innerHTML = `
+        <div class="card p-3">
+          <h5>Commande #${order.id}</h5>
+          <p><strong>Status:</strong> ${order.status}</p>
+          <p><strong>Total:</strong> ${order.total.toFixed(2)} €</p>
+          <ul>${order.items.map(i => `<li>${i.name} - ${i.price.toFixed(2)}€</li>`).join('')}</ul>
+        </div>
+      `;
+      container.appendChild(div);
+    });
+  });
+</script>
+{% endblock %}

@@ -1,39 +1,40 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cart</title>
-    <link rel="stylesheet" href="/static/css/styles.css">
-    <script src="/static/js/scripts.js" defer></script>
-</head>
-<body>
-    <header>
-        <h1>Cart</h1>
-        <nav>
-            <a href="/">Home</a>
-            <a href="/menu">Menu</a>
-            <a href="/orders">Orders</a>
-        </nav>
-    </header>
-    <main>
-        <ul id="cart-list"></ul>
-        <p>Total: $<span id="cart-total">0.00</span></p>
-    </main>
-    <script>
-        // Fetch cart items from the backend
-        fetch('/cart')
-            .then(response => response.json())
-            .then(data => {
-                const cartList = document.getElementById('cart-list');
-                const cartTotal = document.getElementById('cart-total');
-                data.items.forEach(item => {
-                    const li = document.createElement('li');
-                    li.textContent = `${item.name} - $${item.price}`;
-                    cartList.appendChild(li);
-                });
-                cartTotal.textContent = data.final_total.toFixed(2);
-            });
-    </script>
-</body>
-</html>
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">Votre panier</h2>
+    <ul id="cart-list" class="list-group mb-3"></ul>
+    <h4>Total : <span id="cart-total">0.00</span> €</h4>
+    <button class="btn btn-success" onclick="placeOrder()">Passer la commande</button>
+    <button class="btn btn-danger" onclick="clearCart()">Vider le panier</button>
+</div>
+
+<script>
+fetch('/cart')
+  .then(res => res.json())
+  .then(data => {
+    const list = document.getElementById("cart-list");
+    const total = document.getElementById("cart-total");
+    data.items.forEach(item => {
+      const li = document.createElement("li");
+      li.className = "list-group-item";
+      li.textContent = `${item.name} - ${item.price.toFixed(2)} €`;
+      list.appendChild(li);
+    });
+    total.textContent = data.total.toFixed(2);
+  });
+
+function placeOrder() {
+  fetch('/order', { method: 'POST' })
+    .then(res => res.json())
+    .then(data => {
+      alert('Commande créée ! Total : ' + data.order.total + ' €');
+      location.reload();
+    });
+}
+
+function clearCart() {
+  fetch('/cart/clear', { method: 'POST' })
+    .then(() => location.reload());
+}
+</script>
+{% endblock %}
